@@ -444,9 +444,36 @@
   button:focus-visible{ outline: 3px solid var(--gold-bright); outline-offset: 4px; }
 
   @media (max-width: 600px){
-    section{ padding: 70px 7vw; }
-    .promise{ gap: 16px; }
-    .seal{ width: 46px; height: 46px; }
+    html{ font-size: 20px; -webkit-text-size-adjust: 100%; }
+    body{ font-size: 21px; line-height: 1.6; }
+    section{ padding: 56px 20px; min-height: 100svh; }
+    #curtain-content{ padding: 24px 20px; overflow-y: auto; }
+    #curtain-content h1{ font-size: clamp(2rem, 10vw, 2.6rem); line-height: 1.18; }
+    .kicker{ font-size: 1rem; }
+    #scene-1 h2, #scene-2 h2{ font-size: 1.8rem; line-height: 1.25; }
+    #scene-1 p, .promise p{ font-size: 1.1rem; }
+    .subtext{ font-size: 1.05rem; }
+    .promise-list{ margin-top: 30px; gap: 26px; }
+    .promise{ gap: 16px; align-items: flex-start; padding: 20px 0 28px; }
+    .promise-copy{ min-width: 0; }
+    .promise-number{ font-size: .75rem; letter-spacing: .06em; }
+    .promise-stamp{ position: static; align-self: flex-end; display: none; }
+    .promise-note{ font-size: .7rem; letter-spacing: .04em; }
+    .promise.is-sealed .promise-note{ max-height: 100px; margin-top: 8px; }
+    .seal{ width: 62px; height: 62px; margin-top: 24px; }
+    .seal-label{ font-size: .75rem; bottom: -27px; }
+    .seal.sealed::after{ font-size: .8rem; }
+    .raise-btn{ font-size: 1.1rem; min-height: 56px; padding: 14px 24px; }
+    .progress-line, .stage-cue{ font-size: 1rem; }
+    .seal-dialog{ width: calc(100% - 16px); max-height: calc(100dvh - 16px); padding: 20px 16px 28px; border-radius: 20px; }
+    #finaleDialog h2{ font-size: 1.65rem; line-height: 1.25; }
+    #finaleDialog p{ font-size: 1.1rem; line-height: 1.55; }
+    .dialog-close{ width: 48px; height: 48px; margin: 0 0 16px auto; }
+    .catch-game{ padding: 18px 8px; }
+    .chase-lane{ height: 132px; }
+    .chase-button{ min-height: 56px; font-size: 1rem; padding: 12px 16px; }
+    #finaleDialog .game-status{ font-size: 1rem; }
+    .game-reset{ font-size: 1rem; min-height: 48px; }
   }
 
   @media (prefers-reduced-motion: reduce){
