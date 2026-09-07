@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>An Apology, Staged Properly</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --velvet: #4a0f22;
+    --velvet-deep: #23050f;
+    --velvet-shadow: #150309;
+    --gold: #c9a24b;
+    --gold-bright: #e6c877;
+    --cream: #f3e6d3;
+    --rose: #9c2b3a;
+    --rose-dark: #6d1522;
+    --ink: #1c0a10;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    background: var(--velvet-deep);
+    color: var(--cream);
+    font-family: 'EB Garamond', serif;
+    font-size: 19px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, .display{
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+  }
+
+  /* ---------- floating light motes ---------- */
+  .motes{
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+  }
+  .mote{
+    position: absolute;
+    bottom: -10px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    opacity: 0.5;
+    animation: drift linear infinite;
+  }
+  @keyframes drift{
+    0%{ transform: translateY(0) translateX(0); opacity: 0; }
+    10%{ opacity: 0.6; }
+    90%{ opacity: 0.4; }
+    100%{ transform: translateY(-110vh) translateX(20px); opacity: 0; }
+  }
+
+  /* ---------- curtain overlay ---------- */
+  #curtain{
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+  }
+  .panel{
+    flex: 1;
+    position: relative;
+    background:
+      repeating-linear-gradient(
+        90deg,
+        var(--velvet) 0px,
+        var(--rose-dark) 18px,
+        var(--velvet) 36px,
+        var(--velvet-shadow) 54px
+      );
+    box-shadow: inset -40px 0 60px rgba(0,0,0,0.5);
+    transition: transform 1.6s cubic-bezier(.76,0,.24,1);
+  }
+  .panel.right{ transform: scaleX(-1); }
+  .panel::after{
+    content:"";
+    position:absolute;
+    bottom:0; left:0; right:0;
+    height: 34px;
+    background:
+      linear-gradient(180deg, transparent, rgba(0,0,0,0.35)),
+      repeating-linear-gradient(90deg, var(--gold) 0 10px, var(--gold-bright) 10px 12px);
+    box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
+  }
+  #curtain.open .panel.left{ transform: translateX(-102%); }
+  #curtain.open .panel.right{ transform: scaleX(-1) translateX(-102%); }
+  #curtain.gone{ display:none; }
+
+  #curtain-content{
+    position: absolute;
+    inset: 0;
+    z-index: 51;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+    transition: opacity 0.6s ease;
+  }
+  #curtain.open #curtain-content{ opacity: 0; pointer-events: none; }
+
+  .spotlight{
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    width: 900px;
+    height: 900px;
+    transform: translateX(-50%);
+    background: radial-gradient(circle, rgba(230,200,119,0.18), transparent 60%);
+    pointer-events: none;
+  }
+
+  .kicker{
+    font-style: italic;
+    color: var(--gold-bright);
+    font-size: 1.05rem;
+    margin-bottom: 18px;
+  }
+
+  #curtain-content h1{
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    max-width: 14ch;
+    color: var(--cream);
+    text-shadow: 0 2px 24px rgba(0,0,0,0.6);
+  }
+
+  .raise-btn{
+    margin-top: 40px;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--ink);
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    border: none;
+    padding: 14px 34px;
+    border-radius: 999px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .raise-btn:hover{ transform: translateY(-2px); box-shadow: 0 10px 26px rgba(0,0,0,0.5); }
+  .raise-btn:focus-visible{ outline: 3px solid var(--cream); outline-offset: 3px; }
+
+  /* ---------- main content ---------- */
+  main{
+    position: relative;
+    z-index: 2;
+  }
+
+  section{
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 90px 8vw;
+    max-width: 780px;
+    margin: 0 auto;
+  }
+
+  .rule{
+    width: 64px;
+    height: 2px;
+    background: var(--gold);
+    margin: 26px 0;
+  }
+
+  #scene-1 h2{
+    font-size: clamp(1.9rem, 4vw, 2.7rem);
+    line-height: 1.25;
+  }
+  #scene-1 p{ font-size: 1.15rem; color: #e7d7c2; max-width: 62ch; }
+  #scene-1 p + p{ margin-top: 18px; }
+
+  /* ---------- promise scene ---------- */
+  #scene-2 h2{ font-size: clamp(1.7rem, 3.6vw, 2.3rem); }
+  .subtext{ color: #d8c3a8; font-style: italic; margin-top: 10px; }
+
+  .promise-list{
+    margin-top: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .promise{
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 18px 4px;
+    border-bottom: 1px solid rgba(201,162,75,0.25);
+    overflow: visible;
+    transition: border-color 0.45s ease, background 0.45s ease, transform 0.35s ease;
+  }
+  .promise:not(.is-sealed):hover{
+    transform: translateX(6px);
+    border-color: rgba(201,162,75,0.55);
+  }
+  .promise.is-sealed{
+    border-color: rgba(201,162,75,0.6);
+    background: linear-gradient(90deg, rgba(156,43,58,0.14), transparent);
+  }
+  .promise-copy{
+    flex: 1;
+    position: relative;
+  }
+  .promise-number{
+    display: block;
+    color: var(--gold);
+    font-family: 'Playfair Display', serif;
+    font-size: 0.8rem;
+    letter-spacing: 0.12em;
+    margin-bottom: 3px;
+  }
+  .promise p{
+    font-size: 1.12rem;
+    transition: color 0.45s ease, transform 0.45s ease;
+  }
+  .promise.is-sealed p{
+    color: var(--gold-bright);
+    transform: translateX(5px);
+  }
+  .promise-note{
+    display: block;
+    max-height: 0;
+    overflow: hidden;
+    color: var(--gold-bright);
+    font-size: 0.78rem;
+    letter-spacing: 0.13em;
+    opacity: 0;
+    transform: translateY(-5px);
+    transition: max-height 0.45s ease, opacity 0.45s ease, transform 0.45s ease;
+  }
+  .promise.is-sealed .promise-note{
+    max-height: 30px;
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+  .promise-stamp{
+    position: absolute;
+    top: 7px;
+    right: 78px;
+    padding: 2px 7px;
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    font-family: 'Playfair Display', serif;
+    font-size: 0.64rem;
+    letter-spacing: 0.14em;
+    transform: rotate(-8deg) scale(0.5);
+    opacity: 0;
+    transition: opacity 0.35s ease, transform 0.45s cubic-bezier(.34,1.56,.64,1);
+  }
+  .promise.is-sealed .promise-stamp{
+    opacity: 0.85;
+    transform: rotate(-8deg) scale(1);
+  }
+  .seal{
+    flex-shrink: 0;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    border: 2px solid var(--gold);
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    z-index: 1;
+    transition: transform 0.35s cubic-bezier(.34,1.56,.64,1), background 0.35s ease, box-shadow 0.35s ease;
+  }
+  .seal:hover{ transform: scale(1.1) rotate(-5deg); box-shadow: 0 0 0 7px rgba(201,162,75,0.1); }
+  .seal:focus-visible{ outline: 3px solid var(--cream); outline-offset: 3px; }
+  .seal::before{
+    content:"";
+    position:absolute; inset: 6px;
+    border-radius: 50%;
+    border: 1px dashed rgba(201,162,75,0.5);
+  }
+  .seal.sealed{
+    background: radial-gradient(circle at 35% 30%, var(--rose) 0%, var(--rose-dark) 70%);
+    border-color: var(--rose-dark);
+    transform: scale(1);
+    box-shadow: 0 0 0 7px rgba(156,43,58,0.12);
+  }
+  .seal.sealed::before{ border: none; }
+  .seal.sealed::after{
+    content: "sealed";
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gold-bright);
+    font-family: 'Playfair Display', serif;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+  }
+  .seal.sealed .seal-label{ opacity: 0; }
+  .seal-label{
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: #b8a181;
+    white-space: nowrap;
+  }
+
+  .spark{
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    left: 50%;
+    top: 50%;
+    border-radius: 50%;
+    background: var(--gold-bright);
+    pointer-events: none;
+    animation: spark-fly 0.75s ease-out forwards;
+  }
+  @keyframes spark-fly{
+    0%{ transform: rotate(var(--angle)) translateX(0) scale(1); opacity: 1; }
+    100%{ transform: rotate(var(--angle)) translateX(52px) scale(0); opacity: 0; }
+  }
+  @keyframes curtain-call{
+    0%, 100%{ transform: translateX(0); }
+    25%{ transform: translateX(-5px); }
+    50%{ transform: translateX(5px); }
+    75%{ transform: translateX(-3px); }
+  }
+  .curtain-call #promiseList{ animation: curtain-call 0.65s ease; }
+
+  .stage-cue{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 30px;
+    color: #b8a181;
+    font-size: 0.95rem;
+    text-align: center;
+  }
+  .stage-cue::before, .stage-cue::after{
+    content: "";
+    width: 28px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.65;
+  }
+
+  .progress-line{
+    margin-top: 50px;
+    font-style: italic;
+    color: var(--gold-bright);
+    text-align: center;
+    min-height: 1.7em;
+    transition: opacity 0.3s ease;
+  }
+
+  /* ---------- finale ---------- */
+  .rose{
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 30px;
+    position: relative;
+  }
+  .petal{
+    position: absolute;
+    width: 46px;
+    height: 46px;
+    border-radius: 50% 0;
+    background: radial-gradient(circle at 30% 30%, var(--rose), var(--rose-dark));
+    top: 22px; left: 22px;
+    transform-origin: 0 0;
+    animation: bloom 1.2s cubic-bezier(.34,1.56,.64,1) backwards;
+  }
+  @keyframes bloom{
+    0%{ transform: scale(0) rotate(var(--rot)); opacity: 0; }
+    100%{ transform: scale(1) rotate(var(--rot)); opacity: 1; }
+  }
+
+  #finaleDialog h2{
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    max-width: 20ch;
+    margin: 0 auto;
+  }
+  #finaleDialog .her-name{ color: var(--gold-bright); font-style: italic; }
+  #finaleDialog p{
+    margin-top: 20px;
+    color: #e7d7c2;
+    max-width: 56ch;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 1.12rem;
+  }
+  .signoff{
+    margin-top: 36px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--cream);
+  }
+
+  footer{
+    text-align: center;
+    padding: 40px 20px 60px;
+    color: #7d5f4a;
+    font-size: 0.85rem;
+    font-style: italic;
+  }
+
+  body.dialog-open{ overflow: hidden; }
+  .seal-dialog{
+    margin: auto; width: min(620px, calc(100% - 28px));
+    max-height: calc(100dvh - 28px); overflow-y: auto;
+    padding: clamp(24px, 5vw, 48px); color: var(--cream);
+    background: radial-gradient(ellipse at top, #641d32, var(--velvet-deep) 70%);
+    border: 1px solid var(--gold); border-radius: 24px;
+    box-shadow: 0 30px 100px #0009; text-align: center;
+  }
+  .seal-dialog::backdrop{ background: #150309d9; backdrop-filter: blur(8px); }
+  .seal-dialog[open]{ animation: backstage-in .35s ease both; }
+  @keyframes backstage-in{ from{ opacity: 0; transform: translateY(20px) scale(.96); } to{ opacity: 1; transform: none; } }
+  .dialog-close{ display: block; margin: -8px -8px 12px auto; background: transparent; border: 1px solid #c9a24b66; border-radius: 50%; color: var(--cream); width: 44px; height: 44px; font-size: 26px; cursor: pointer; }
+  .seal-dialog h2{ font-size: clamp(1.7rem, 5vw, 2.5rem); line-height: 1.2; }
+  .catch-game{ margin-top: 26px; padding: 18px 10px; border: 1px dashed #c9a24b88; border-radius: 18px; background: #15030955; }
+  #finaleDialog .game-hint{ margin-top: 0; color: var(--gold-bright); font-style: italic; }
+  .chase-lane{ position: relative; height: 105px; margin-top: 10px; overflow: hidden; }
+  .chase-button{ position: absolute; left: 8px; top: 24px; max-width: calc(100% - 16px); min-height: 46px; padding: 10px 18px; border: 1px solid var(--gold); border-radius: 999px; background: var(--gold-bright); color: var(--ink); font: 1rem 'EB Garamond', serif; cursor: pointer; touch-action: manipulation; transition: left .16s ease-out, top .16s ease-out, rotate .16s; }
+  .chase-lane:nth-of-type(2) .chase-button{ background: #783044; color: var(--cream); }
+  .chase-button.caught{ background: #f3e6d3; color: var(--ink); rotate: 0deg !important; }
+  #finaleDialog .game-status{ min-height: 3.4em; margin: 10px 0 0; font-size: 1rem; color: var(--gold-bright); }
+  .game-reset{ margin-top: 12px; padding: 8px 16px; min-height: 44px; border: 0; background: transparent; color: var(--gold-bright); font: italic 1rem 'EB Garamond', serif; text-decoration: underline; cursor: pointer; }
+  button:focus-visible{ outline: 3px solid var(--gold-bright); outline-offset: 4px; }
+
+  @media (max-width: 600px){
+    section{ padding: 70px 7vw; }
+    .promise{ gap: 16px; }
+    .seal{ width: 46px; height: 46px; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="motes" id="motes"></div>
+
+<div id="curtain">
+  <div class="panel left"></div>
+  <div class="panel right"></div>
+  <div id="curtain-content">
+    <div class="spotlight"></div>
+    <div class="kicker">a performance in three short acts</div>
+    <h1 class="display">An Apology, Staged Properly, For <span class="her-name">My Baby</span></h1>
+    <button class="raise-btn" id="raiseBtn">Raise the curtain</button>
+  </div>
+</div>
+
+<main>
+  <section id="scene-1">
+    <div class="kicker">Act One</div>
+    <h2 class="display">I know "sorry" has started to sound like a line I keep reading off the same page.</h2>
+    <div class="rule"></div>
+    <p>Baby, these past few days, I said things and didn't follow through. I let moments slide that mattered to you, and let you down more than once, and I understand why my word doesn't feel like something you can lean on right now.</p>
+    <p>That's not who I want to be for you. Not almost on time. Not "I meant to." Not <em>this time will be different</em> said one time too many. You deserve someone whose word is solid ground, not something you have to double check.</p>
+    <p>So instead of one more apology you have to take on faith, here's what I'm actually promising, out loud, in writing.</p>
+  </section>
+
+  <section id="scene-2">
+    <div class="kicker">Act Two</div>
+    <h2 class="display">The Promises</h2>
+    <p class="subtext">Baby, press the seal on each one. Not to close the conversation, but to mark it. These are the ones I'm keeping.</p>
+    <div class="promise-list" id="promiseList">
+      <div class="promise" data-cue="That one is on the record.">
+        <div class="promise-copy">
+          <span class="promise-number">01 / THE HONEST ANSWER</span>
+          <p>I'll say what I mean, and mean what I say, even when the honest answer is harder to give.</p>
+          <span class="promise-note">NO MORE PERFORMING AROUND THE TRUTH</span>
+        </div>
+        <span class="promise-stamp">KEPT</span>
+        <button class="seal" aria-label="Seal this promise" aria-pressed="false" data-index="0"><span class="seal-label">seal it</span></button>
+      </div>
+      <div class="promise" data-cue="No more leaving you guessing.">
+        <div class="promise-copy">
+          <span class="promise-number">02 / THE HEADS-UP</span>
+          <p>If I'm running late or plans change, you'll hear it from me before you have to wonder.</p>
+          <span class="promise-note">YOU SHOULD NEVER HAVE TO CHASE AN ANSWER</span>
+        </div>
+        <span class="promise-stamp">KEPT</span>
+        <button class="seal" aria-label="Seal this promise" aria-pressed="false" data-index="1"><span class="seal-label">seal it</span></button>
+      </div>
+      <div class="promise" data-cue="Trust gets built in the small scenes.">
+        <div class="promise-copy">
+          <span class="promise-number">03 / THE LONG GAME</span>
+          <p>Your trust isn't something I get to spend carelessly. I'll earn it back one kept promise at a time, not one grand gesture.</p>
+          <span class="promise-note">ONE ORDINARY DAY AT A TIME</span>
+        </div>
+        <span class="promise-stamp">KEPT</span>
+        <button class="seal" aria-label="Seal this promise" aria-pressed="false" data-index="2"><span class="seal-label">seal it</span></button>
+      </div>
+      <div class="promise" data-cue="The words only count if the actions follow.">
+        <div class="promise-copy">
+          <span class="promise-number">04 / THE FOLLOW-THROUGH</span>
+          <p>I'm done letting "I'm sorry" do the work my actions should be doing.</p>
+          <span class="promise-note">LET THE DOING SPEAK LOUDER</span>
+        </div>
+        <span class="promise-stamp">KEPT</span>
+        <button class="seal" aria-label="Seal this promise" aria-pressed="false" data-index="3"><span class="seal-label">seal it</span></button>
+      </div>
+    </div>
+    <p class="progress-line" id="progressLine" aria-live="polite">0 of 4 sealed. Start with any promise.</p>
+    <div class="stage-cue" id="stageCue" aria-live="polite">Choose a promise. Give it a little ceremony.</div>
+    <button class="raise-btn" id="replayFinale" hidden>Read the final act again &hearts;</button>
+  </section>
+
+</main>
+
+<dialog class="seal-dialog" id="finaleDialog" aria-labelledby="finaleTitle">
+  <button class="dialog-close" id="closeFinale" aria-label="Close final act">&times;</button>
+  <div class="kicker">Act Three &middot; every promise sealed</div>
+
+      <div class="rose" id="rose"></div>
+      <h2 class="display" id="finaleTitle" tabindex="-1" autofocus>Every word up there was true, baby, but the truest part is this.</h2>
+      <p>I'm not perfect, and I'm going to keep working to be someone whose word actually means something to you. Not because I said so tonight, but because I'll keep showing you, day after ordinary day.</p>
+      <p class="signoff">Thank you for still being here while I get better at this. i miss you and care about you, my baby Zindzi.</p>
+
+  <div class="catch-game" aria-label="Catch a little affection">
+    <p class="game-hint">Tap to catch me, baby. I might run away a few times.</p>
+    <div class="chase-lane"><button class="chase-button" data-reward="You caught your hug, baby. Imagine me wrapping my arms around you and holding you a little longer. I miss having you close. Until I can give you this hug in person, keep this little one with you." data-label="Catch a hug">Catch a hug &hearts;</button></div>
+    <div class="chase-lane"><button class="chase-button" data-reward="You caught me... but this secret? I'll tell you in person. Come a little closer when you see me, okay?" data-label="Steal a secret">Steal a secret &#10022;</button></div>
+    <p class="game-status" id="gameStatus" role="status">These two are feeling shy. Try tapping one&hellip;</p>
+    <button class="game-reset" id="resetGame" hidden>Again? I'll behave this time. Maybe.</button>
+  </div>
+
+  <button class="raise-btn" id="finishFinale">Keep these words close &hearts;</button>
+</dialog>
+
+<script>
+  // ---- EDIT HER NAME HERE ----
+  const HER_NAME = "My Baby";
+  document.querySelectorAll('.her-name').forEach(el => el.textContent = HER_NAME);
+
+  // floating motes
+  const motesContainer = document.getElementById('motes');
+  const MOTE_COUNT = 24;
+  for(let i=0;i<MOTE_COUNT;i++){
+    const m = document.createElement('div');
+    m.className = 'mote';
+    m.style.left = Math.random()*100 + 'vw';
+    m.style.animationDuration = (10 + Math.random()*14) + 's';
+    m.style.animationDelay = (Math.random()*14) + 's';
+    m.style.opacity = 0.3 + Math.random()*0.4;
+    motesContainer.appendChild(m);
+  }
+
+  // curtain
+  const curtain = document.getElementById('curtain');
+  document.getElementById('raiseBtn').addEventListener('click', () => {
+    curtain.classList.add('open');
+    setTimeout(() => curtain.classList.add('gone'), 1700);
+  });
+
+  // seals
+  const seals = document.querySelectorAll('.seal');
+  const promises = document.querySelectorAll('.promise');
+  const progressLine = document.getElementById('progressLine');
+  const stageCue = document.getElementById('stageCue');
+  const scene3 = document.getElementById('finaleDialog');
+  let sealedCount = 0;
+  const replayFinale = document.getElementById('replayFinale');
+  document.getElementById('closeFinale').addEventListener('click', () => scene3.close());
+  document.getElementById('finishFinale').addEventListener('click', () => scene3.close());
+  scene3.addEventListener('close', () => {
+    document.body.classList.remove('dialog-open');
+    replayFinale.focus({preventScroll: true});
+  });
+  replayFinale.addEventListener('click', unlockFinale);
+
+  const chaseButtons = [...document.querySelectorAll('.chase-button')];
+  const gameStatus = document.getElementById('gameStatus');
+  const resetGame = document.getElementById('resetGame');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  const chaseState = new Map();
+  const teases = ['Oops. A little closer, baby.', 'Too slow. I saw that coming.', 'Okay, okay. One more try?', 'Fine, you win. Catch me now.'];
+
+  function startChase(){
+    chaseButtons.forEach(button => {
+      chaseState.set(button, {dodges: 0, caught: false, dodgedThisTap: false});
+      button.classList.remove('caught');
+      button.textContent = button.dataset.label + ' \u2665';
+      button.style.left = '8px';
+      button.style.top = '24px';
+      button.style.rotate = '0deg';
+    });
+    gameStatus.textContent = reducedMotion.matches ? 'Pick a little hug or a secret. Both are yours.' : 'These two are feeling shy. Try tapping one\u2026';
+    resetGame.hidden = true;
+  }
+
+  function dodge(button, event){
+    const state = chaseState.get(button);
+    if(state.caught || state.dodges >= 4 || reducedMotion.matches) return;
+    if(event.cancelable) event.preventDefault();
+    const lane = button.parentElement;
+    const maxX = Math.max(8, lane.clientWidth - button.offsetWidth - 8);
+    const maxY = Math.max(0, lane.clientHeight - button.offsetHeight - 4);
+    const nextX = button.offsetLeft < (maxX + 8) / 2 ? maxX : 8;
+    button.style.left = nextX + 'px';
+    button.style.top = (button.offsetTop < maxY / 2 ? maxY : 0) + 'px';
+    button.style.rotate = (state.dodges % 2 ? -4 : 4) + 'deg';
+    gameStatus.textContent = teases[state.dodges];
+    state.dodges++;
+    state.dodgedThisTap = true;
+  }
+
+  chaseButtons.forEach(button => {
+    // Move as soon as a finger touches down, before its release can catch the button.
+    button.addEventListener('pointerdown', event => {
+      chaseState.get(button).dodgedThisTap = false;
+      dodge(button, event);
+    });
+    button.addEventListener('click', event => {
+      const state = chaseState.get(button);
+      // Keyboard activation always works; pointer play becomes catchable after four dodges.
+      if(event.detail !== 0 && !reducedMotion.matches && (state.dodges < 4 || state.dodgedThisTap)) return;
+      if(state.caught){ gameStatus.textContent = button.dataset.reward; return; }
+      state.caught = true;
+      button.classList.add('caught');
+      button.textContent = button.dataset.label === 'Catch a hug' ? 'Hug caught \u2665' : 'Secret unlocked \u2726';
+      gameStatus.textContent = button.dataset.reward;
+      createSparks(button);
+      resetGame.hidden = !chaseButtons.every(candidate => chaseState.get(candidate).caught);
+    });
+  });
+  resetGame.addEventListener('click', () => { startChase(); chaseButtons[0].focus(); });
+
+  seals.forEach(seal => {
+    seal.addEventListener('click', () => {
+      if(seal.classList.contains('sealed')) return;
+      seal.classList.add('sealed');
+      seal.setAttribute('aria-pressed', 'true');
+      seal.setAttribute('aria-label', 'Promise sealed');
+      const promise = seal.closest('.promise');
+      promise.classList.add('is-sealed');
+      stageCue.textContent = promise.dataset.cue;
+      createSparks(seal);
+      sealedCount++;
+      if(sealedCount < seals.length){
+        progressLine.textContent = sealedCount + ' of ' + seals.length + ' sealed. The scene is building.';
+        const nextSeal = [...seals].find(candidate => !candidate.classList.contains('sealed'));
+        nextSeal.focus({preventScroll: true});
+      }
+      if(sealedCount === seals.length){
+        progressLine.textContent = 'Every promise sealed. Curtain call.';
+        stageCue.textContent = 'That is the whole promise. Watch what happens next.';
+        document.body.classList.add('curtain-call');
+        setTimeout(unlockFinale, 650);
+      }
+    });
+  });
+
+  promises.forEach(promise => {
+    promise.addEventListener('click', event => {
+      if(event.target.closest('.seal')) return;
+      promise.querySelector('.seal').focus();
+    });
+  });
+
+  function createSparks(seal){
+    for(let i = 0; i < 10; i++){
+      const spark = document.createElement('span');
+      spark.className = 'spark';
+      spark.style.setProperty('--angle', (i * 36) + 'deg');
+      seal.appendChild(spark);
+      setTimeout(() => spark.remove(), 800);
+    }
+  }
+
+  function unlockFinale(){
+    if(sealedCount !== seals.length || scene3.open) return;
+    replayFinale.hidden = false;
+    scene3.showModal();
+    startChase();
+    document.body.classList.add('dialog-open');
+    const rose = document.getElementById('rose');
+    rose.replaceChildren();
+    const petalCount = 8;
+    for(let i=0;i<petalCount;i++){
+      const p = document.createElement('div');
+      p.className = 'petal';
+      const rot = (360/petalCount)*i;
+      p.style.setProperty('--rot', rot + 'deg');
+      p.style.animationDelay = (i*0.06) + 's';
+      rose.appendChild(p);
+    }
+
+  }
+</script>
+
+</body>
+</html>
